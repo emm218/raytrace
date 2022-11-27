@@ -29,18 +29,16 @@ use glutin::{
         GetGlDisplay 
     },
     error::Result as GlutinResult,
+    prelude::GlSurface,
     surface::{ Surface, SurfaceAttributesBuilder, WindowSurface },
 };
 
-mod renderer;
-
-use renderer::Renderer;
+use crate::renderer;
 
 pub struct Display {
     pub window: Window,
     context: PossiblyCurrentContext,
     surface: Surface<WindowSurface>,
-    renderer: Renderer,
 }
 
 impl Display {
@@ -52,17 +50,19 @@ impl Display {
         
         let context = context.make_current(&surface)?;
         
-        let mut renderer = Renderer::new(&context)?;
+        renderer::init(&context);
         
-        renderer.resize(window.inner_size());
+        renderer::resize(window.inner_size());
 
-        renderer.clear();
+        renderer::clear();
+
+        surface.swap_buffers(&context).expect("failed to swap buffers.");
+        renderer::finish();
 
         Ok(Self {
             window,
             context,
             surface,
-            renderer
         })
     }
 }

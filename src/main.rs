@@ -7,6 +7,7 @@ use winit::{
 };
 
 mod display;
+mod renderer;
 
 use display::Display;
 
