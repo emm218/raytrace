@@ -7,6 +7,8 @@ edition = "2021"
 bytemuck = "1.12"
 crossfont = "0.5"
 gl = "0.14"
-glfw = { version = "0.47", default-features = false }
 image = "0.24"
 ultraviolet = { version = "0.6" }
+glutin = "0.30"
+winit = "0.27"
+raw-window-handle = "0.5.0"
