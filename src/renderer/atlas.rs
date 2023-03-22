@@ -124,6 +124,12 @@ impl Atlas {
             return Err(AtlasInsertError::Full);
         }
 
+        let lower_left = glyph_bounds.lower_left();
+        let transform = Transform2F::from_translation(Vector2F::new(
+            (self.insert_x - lower_left.x()) as f32,
+            (self.insert_y - lower_left.y()) as f32,
+        ));
+
         let uv_left = self.to_uv(self.insert_x);
         let uv_bot = self.to_uv(self.insert_y);
         let uv_width = self.to_uv(glyph_width);
@@ -135,11 +141,6 @@ impl Atlas {
         if self.dirty_y + self.dirty_height < self.insert_y + glyph_height {
             self.dirty_height = self.insert_y + glyph_height - self.dirty_y;
         }
-
-        let transform = Transform2F::from_translation(Vector2F::new(
-            self.insert_x as f32,
-            self.insert_y as f32,
-        ));
 
         Ok((
             transform,

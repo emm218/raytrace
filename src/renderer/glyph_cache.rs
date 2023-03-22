@@ -66,7 +66,7 @@ impl From<FontLoadingError> for GlyphCacheError {
 
 pub struct GlyphCache {
     cache: HashMap<u32, GlyphTexInfo, BuildHasherDefault<FnvHasher>>,
-    atlases: Vec<Atlas>,
+    pub atlases: Vec<Atlas>,
     font: Font,
     font_size: f32,
 }
@@ -74,7 +74,7 @@ pub struct GlyphCache {
 impl GlyphCache {
     pub fn new(font_size: f32) -> Result<Self, GlyphCacheError> {
         let font_handle = SystemSource::new()
-            .select_best_match(&[FamilyName::Monospace], &Properties::new())?;
+            .select_best_match(&[FamilyName::SansSerif], &Properties::new())?;
         let font = font_handle.load()?;
 
         let atlases = vec![Atlas::new()];
@@ -108,6 +108,15 @@ impl GlyphCache {
         let atlas = &mut self.atlases.last_mut().unwrap();
         let font = &mut self.font;
 
+        // println!(
+        //     "{:?} {:?} {:?}\n{:?}\n{:?}\n",
+        //     bounds.upper_right(),
+        //     bounds.lower_left(),
+        //     bounds.lower_right(),
+        //     transform,
+        //     glyph
+        // );
+
         font.rasterize_glyph(
             &mut atlas.canvas,
             glyph_id,
@@ -118,6 +127,14 @@ impl GlyphCache {
         )?;
 
         Ok(*self.cache.entry(glyph_id).or_insert(glyph))
+    }
+
+    pub fn cache_common(&mut self) {
+        for i in 32u8..=126u8 {
+            println!("{}", i as char);
+            let glyph_id = self.font.glyph_for_char(i as char).unwrap();
+            self.get(glyph_id);
+        }
     }
 
     fn load_glyph(

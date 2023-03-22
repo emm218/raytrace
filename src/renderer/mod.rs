@@ -261,6 +261,8 @@ impl Renderer {
 
         let mut glyph_cache = GlyphCache::new(12.0)?;
 
+        glyph_cache.cache_common();
+
         // cache all basic ascii characters
         // for i in 32u8..=126u8 {
         //     glyph_cache.get(i as char);
@@ -318,7 +320,6 @@ impl Drop for Renderer {
 pub struct TextShaderProgram {
     program: ShaderProgram,
     u_projection: GLint,
-    u_cell_dim: GLint,
     u_rendering_pass: GLint,
 }
 
@@ -327,7 +328,6 @@ impl TextShaderProgram {
         let program = ShaderProgram::new(TEXT_SHADER_V, TEXT_SHADER_F)?;
         Ok(Self {
             u_projection: program.get_uniform_location(cstr!("projection"))?,
-            u_cell_dim: program.get_uniform_location(cstr!("cellDim"))?,
             u_rendering_pass: program
                 .get_uniform_location(cstr!("renderingPass"))?,
             program,
@@ -336,10 +336,6 @@ impl TextShaderProgram {
 
     pub fn id(&self) -> GLuint {
         self.program.id()
-    }
-
-    unsafe fn set_cell_dim(&self, cell_width: f32, cell_height: f32) {
-        gl::Uniform2f(self.u_cell_dim, cell_width, cell_height);
     }
 
     unsafe fn set_rendering_pass(&self, rendering_pass: RenderingPass) {
