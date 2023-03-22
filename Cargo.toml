@@ -4,11 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bitflags = "1" 
 bytemuck = "1.12"
-crossfont = "0.5"
+fnv = "1.0.7"
+font-kit = "0.11.0"
 gl = "0.14"
-image = "0.24"
-ultraviolet = { version = "0.6" }
 glutin = "0.30"
-winit = "0.27"
+harfbuzz-sys = "0.5.0"
+image = "0.24"
+pathfinder_geometry = "0.5.1"
 raw-window-handle = "0.5.0"
+ultraviolet = { version = "0.6" }
+winit = "0.28"
