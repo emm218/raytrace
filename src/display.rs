@@ -69,7 +69,21 @@ impl Display {
         })
     }
 
-    pub fn resize(&self, _size: PhysicalSize<u32>) {}
+    pub fn resize(&mut self, size: PhysicalSize<u32>) {
+        self.renderer.resize(size.width as f32, size.height as f32);
+    }
+
+    pub fn draw(&self) {
+        self.make_current();
+        self.renderer.clear();
+        self.renderer.draw();
+        unsafe {
+            gl::Finish();
+        }
+        self.surface
+            .swap_buffers(&self.context)
+            .expect("failed to swap buffers.");
+    }
 
     fn make_current(&self) {
         if !self.context.is_current() {

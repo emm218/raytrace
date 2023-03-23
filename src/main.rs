@@ -30,7 +30,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 WindowEvent::Resized(size) => display.resize(size),
                 _ => (),
             },
-            Event::RedrawRequested(_) => {}
+            Event::RedrawRequested(_) => {
+                display.draw();
+            }
             _ => (),
         }
     })

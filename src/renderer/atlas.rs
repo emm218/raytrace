@@ -9,7 +9,7 @@ use pathfinder_geometry::{
     vector::{Vector2F, Vector2I},
 };
 
-pub const ATLAS_SIZE: i32 = 1024;
+pub const ATLAS_SIZE: i32 = 256;
 
 pub enum AtlasInsertError {
     // the texture atlas is full
@@ -57,11 +57,11 @@ impl Atlas {
             gl::TexImage2D(
                 gl::TEXTURE_2D,
                 0,
-                gl::RGBA as i32,
+                gl::RED as i32,
                 ATLAS_SIZE,
                 ATLAS_SIZE,
                 0,
-                gl::RGBA,
+                gl::RED,
                 gl::UNSIGNED_BYTE,
                 ptr::null(),
             );
@@ -91,7 +91,7 @@ impl Atlas {
             gl::BindTexture(gl::TEXTURE_2D, 0);
         }
 
-        let canvas = Canvas::new(Vector2I::splat(ATLAS_SIZE), Format::Rgba32);
+        let canvas = Canvas::new(Vector2I::splat(ATLAS_SIZE), Format::A8);
 
         Self {
             tex_id,
@@ -124,10 +124,11 @@ impl Atlas {
             return Err(AtlasInsertError::Full);
         }
 
-        let lower_left = glyph_bounds.lower_left();
+        let x = glyph_bounds.origin_x();
+        let y = glyph_bounds.origin_y();
         let transform = Transform2F::from_translation(Vector2F::new(
-            (self.insert_x - lower_left.x()) as f32,
-            (self.insert_y - lower_left.y()) as f32,
+            (self.insert_x - x) as f32,
+            (self.insert_y - y) as f32,
         ));
 
         let uv_left = self.to_uv(self.insert_x);
@@ -159,7 +160,6 @@ impl Atlas {
         if new_y > ATLAS_SIZE {
             return Err(AtlasInsertError::Full);
         }
-
         self.insert_y = new_y;
         self.insert_x = 0;
         self.row_tallest = 0;
@@ -176,6 +176,7 @@ impl Atlas {
         if self.dirty_height == 0 {
             return;
         }
+
         let pixels = &self.canvas.pixels;
         let stride = self.canvas.stride;
         let start = stride * self.dirty_y as usize;
@@ -191,13 +192,13 @@ impl Atlas {
             self.dirty_y,
             ATLAS_SIZE,
             self.dirty_height,
-            gl::RGBA,
+            gl::RED,
             gl::UNSIGNED_BYTE,
             pixels_slice.as_ptr() as *const _,
         );
 
         // unbind texture
-        gl::BindTexture(gl::TEXTURE_2D, 0);
+        // gl::BindTexture(gl::TEXTURE_2D, 0);
 
         self.dirty_y = ATLAS_SIZE + 1;
         self.dirty_height = 0;

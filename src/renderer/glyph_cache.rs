@@ -100,7 +100,7 @@ impl GlyphCache {
             self.font_size,
             Default::default(),
             HintingOptions::None,
-            RasterizationOptions::SubpixelAa,
+            RasterizationOptions::GrayscaleAa,
         )?;
 
         let (transform, glyph) = self.load_glyph(&bounds);
@@ -123,17 +123,21 @@ impl GlyphCache {
             font_size,
             transform,
             HintingOptions::None,
-            RasterizationOptions::SubpixelAa,
+            RasterizationOptions::GrayscaleAa,
         )?;
 
         Ok(*self.cache.entry(glyph_id).or_insert(glyph))
     }
 
     pub fn cache_common(&mut self) {
-        for i in 32u8..=126u8 {
-            println!("{}", i as char);
+        for i in 32u8..127u8 {
+            // println!("{}", i as char);
             let glyph_id = self.font.glyph_for_char(i as char).unwrap();
             self.get(glyph_id);
+        }
+        let cur = self.current_atlas();
+        unsafe {
+            cur.update_texture();
         }
     }
 
